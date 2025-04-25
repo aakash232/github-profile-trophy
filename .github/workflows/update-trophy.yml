@@ -21,7 +21,7 @@ jobs:
           echo "Assets directory contents before download:"
           ls -a assets
           
-          curl -sL "https://github-profile-trophy-j5llo88zr-aakashs-projects-22fd0f65.vercel.app/?username=aakash232&theme=radical&row=1&column=8&margin-h=15&margin-w=5&no-bg=false&title=-Followers%2C-Stars%2C-Issues" \
+          curl -sL "https://github-profile-trophy-j5llo88zr-aakashs-projects-22fd0f65.vercel.app/?username=aakash232&theme=radical&row=1&column=8&margin-h=15&margin-w=5&no-bg=false&title=-Followers%2C-Stars" \
             -H "x-vercel-protection-bypass: $VERCEL_BYPASS_SECRET" \
             -o assets/trophy.svg
 

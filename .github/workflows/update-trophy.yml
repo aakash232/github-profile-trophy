@@ -2,46 +2,40 @@ name: Update Trophy SVG
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Runs every 6 hours
-  workflow_dispatch:       # Allow manual trigger
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:
 
 jobs:
   update-svg:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_TROPHY_BYPASS_SECRET }}
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Log initial files
+      - name: Download Trophy SVG with Bypass Header
         run: |
-          echo "📂 Initial repo structure:"
-          ls -a
+          mkdir -p assets
+          echo "Assets directory contents before download:"
+          ls -a assets
+          
+          curl -sL "https://github-profile-trophy-j5llo88zr-aakashs-projects-22fd0f65.vercel.app/?username=aakash232&theme=radical&row=1&column=8&margin-h=15&margin-w=5&no-bg=false&title=-Followers%2C-Stars%2C-Issues" \
+            -H "x-vercel-protection-bypass: $VERCEL_BYPASS_SECRET" \
+            -o assets/trophy.svg
 
-      - name: Create assets directory if it doesn't exist
-        run: |
-          if [ ! -d "assets" ]; then
-            echo "🛠 Creating assets directory..."
-            mkdir assets
-          else
-            echo "✅ assets directory already exists."
-          fi
-          echo "📂 Contents of assets:"
-          ls -a assets || echo "(empty)"
+          echo "Assets directory contents after download:"
+          ls -a assets
 
-      - name: Download SVG
-        run: |
-          curl -sL "https://github-profile-trophy-j5llo88zr-aakashs-projects-22fd0f65.vercel.app/?username=aakash232&theme=radical&row=1&column=8&margin-h=15&margin-w=5&no-bg=false&title=-Followers,-Stars,-Issues" -o assets/trophy.svg
-
-      - name: Commit if changed
+      - name: Commit if Changed
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add assets/trophy.svg
-          if ! git diff --cached --quiet; then
-            git commit -m "Update trophy.svg"
-            git pull --rebase origin master
-            git push
-          else
-            echo "🟡 No changes to commit"
-          fi
+          git diff --quiet && echo "No changes to commit" || git commit -m "Update trophy.svg"
+
+      - name: Pull & Push Changes
+        run: |
+          git pull --rebase
+          git push

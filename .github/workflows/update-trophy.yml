@@ -13,9 +13,24 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
+      - name: Log initial files
+        run: |
+          echo "📂 Initial repo structure:"
+          ls -a
+
+      - name: Create assets directory if it doesn't exist
+        run: |
+          if [ ! -d "assets" ]; then
+            echo "🛠 Creating assets directory..."
+            mkdir assets
+          else
+            echo "✅ assets directory already exists."
+          fi
+          echo "📂 Contents of assets:"
+          ls -a assets || echo "(empty)"
+
       - name: Download SVG
         run: |
-          mkdir -p assets
           curl -sL "https://github-profile-trophy-j5llo88zr-aakashs-projects-22fd0f65.vercel.app/?username=aakash232&theme=radical&row=1&column=8&margin-h=15&margin-w=5&no-bg=false&title=-Followers,-Stars,-Issues" -o assets/trophy.svg
 
       - name: Commit if changed
@@ -23,5 +38,9 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add assets/trophy.svg
-          git diff --quiet && echo "No changes to commit" || git commit -m "Update trophy.svg"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Update trophy.svg"
+            git push
+          else
+            echo "🟡 No changes to commit"
+          fi

@@ -32,10 +32,11 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add assets/trophy.svg
-          git diff --quiet && echo "No changes to commit" || git commit -m "Update trophy.svg"
-
+          
+          # Check if there are changes before adding and committing
+          git diff --quiet || (git add assets/trophy.svg && git commit -m "Update trophy.svg")
+          
       - name: Pull & Push Changes
         run: |
-          git pull --rebase
+          git pull --rebase # Now it will work since we've committed changes
           git push
